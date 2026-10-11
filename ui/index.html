@@ -361,7 +361,7 @@
                 Run ./build/tinyml_tests
               </button>
             </div>
-            <div class="terminal-meta" id="termLatency">Latency: -- ms</div>
+            <div class="terminal-meta" id="termLatency">Latency: 6.2 ms</div>
           </div>
 
           <!-- Terminal Mockup -->
@@ -375,10 +375,16 @@
               <div class="terminal-title" id="terminalTitle">tiny-ml-cpp — zsh</div>
               <button class="copy-btn" id="btnCopyTerm" title="Copy output">Copy</button>
             </div>
-            <pre class="terminal-body" id="terminalOutput">
-<span class="term-dim"># Click one of the buttons above to execute compiled C++ binaries live.</span>
-<span class="term-dim"># Or trigger via CLI: ./build/house_prices</span>
-            </pre>
+            <pre class="terminal-body" id="terminalOutput"><span class="term-cyan">$ ./build/house_prices</span>  <span class="term-dim">(6.2 ms)</span>
+
+Loaded 200 houses from data/houses.csv
+Training error (MSE): start 18779935.4 -> end 62171.2
+
+Test results on 40 unseen houses:
+  RMSE : 262.095 (thousand SEK, average miss)
+  <span class="term-cyan">R^2  : 0.979</span> (1.0 = perfect)
+
+New house (85 m2, 3 rooms, 12 years): ~4025 thousand SEK</pre>
           </div>
         </div>
       </section>

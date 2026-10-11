@@ -21,6 +21,7 @@ let probe = { x: 3.5, y: 5.0 }; // Default probe position
 // DOM Ready Initialization
 // -------------------------------------------------------------
 document.addEventListener('DOMContentLoaded', () => {
+  generateFallbackData();
   initTabs();
   initRegressionSliders();
   initKNN();
@@ -28,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initDataExplorer();
   checkServerStatus();
 
-  // Load datasets
+  // Load live datasets from API
   loadDatasets();
 });
 
@@ -55,28 +56,47 @@ function initTabs() {
   const tabs = document.querySelectorAll('.nav-tab');
   const panes = document.querySelectorAll('.tab-pane');
 
+  window.switchTab = (targetId) => {
+    tabs.forEach(t => t.classList.remove('active'));
+    panes.forEach(p => p.classList.remove('active'));
+
+    const tab = document.querySelector(`.nav-tab[data-tab="${targetId}"]`);
+    const pane = document.getElementById(targetId);
+    if (tab) tab.classList.add('active');
+    if (pane) pane.classList.add('active');
+
+    // Re-render canvases if needed on tab show
+    if (targetId === 'tab-regression') {
+      renderLossCurve();
+      renderScatterPlot();
+    } else if (targetId === 'tab-knn') {
+      renderKnnCanvas();
+    }
+  };
+
   tabs.forEach(tab => {
     tab.addEventListener('click', () => {
-      tabs.forEach(t => t.classList.remove('active'));
-      panes.forEach(p => p.classList.remove('active'));
-
-      tab.classList.add('active');
       const targetId = tab.getAttribute('data-tab');
-      const targetPane = document.getElementById(targetId);
-      if (targetPane) {
-        targetPane.classList.add('active');
-      }
-
-      // Re-render canvases if needed on tab show
-      if (targetId === 'tab-regression') {
-        renderLossCurve();
-        renderScatterPlot();
-      } else if (targetId === 'tab-knn') {
-        renderKnnCanvas();
-      }
+      window.switchTab(targetId);
     });
   });
+
+  const params = new URLSearchParams(window.location.search);
+  const qTab = params.get('tab');
+  if (qTab) {
+    if (qTab === 'knn' || qTab === 'tab-knn') window.switchTab('tab-knn');
+    else if (qTab === 'terminal' || qTab === 'tab-terminal') {
+      window.switchTab('tab-terminal');
+      setTimeout(() => {
+        const btn = document.getElementById('btnRunHousePrices');
+        if (btn) btn.click();
+      }, 300);
+    }
+    else if (qTab === 'data' || qTab === 'tab-data') window.switchTab('tab-data');
+    else window.switchTab('tab-regression');
+  }
 }
+
 
 // -------------------------------------------------------------
 // Linear Regression Interactive Predictor
