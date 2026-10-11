@@ -25,6 +25,9 @@ target_link_libraries(house_prices PRIVATE tinyml)
 add_executable(classify_points examples/classify_points.cpp)
 target_link_libraries(classify_points PRIVATE tinyml)
 
+add_executable(real_time_baseband examples/real_time_baseband.cpp)
+target_link_libraries(real_time_baseband PRIVATE tinyml)
+
 # Tests
 enable_testing()
 add_executable(tinyml_tests tests/test_main.cpp)

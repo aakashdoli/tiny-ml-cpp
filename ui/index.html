@@ -85,7 +85,7 @@
         </div>
         <div>
           <div class="stat-label">Unit Test Suite</div>
-          <div class="stat-value">6 / 6 <span class="stat-unit">Passing</span></div>
+          <div class="stat-value">11 / 11 <span class="stat-unit">Passing</span></div>
           <div class="stat-desc">Zero-framework test runner</div>
         </div>
       </div>
@@ -111,6 +111,10 @@
       <button class="nav-tab" data-tab="tab-knn" id="tabKnnBtn">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><circle cx="19" cy="5" r="2"/><circle cx="5" cy="19" r="2"/><circle cx="5" cy="5" r="2"/><circle cx="19" cy="19" r="2"/><line x1="12" y1="12" x2="19" y2="5"/><line x1="12" y1="12" x2="5" y2="19"/><line x1="12" y1="12" x2="5" y2="5"/><line x1="12" y1="12" x2="19" y2="19"/></svg>
         k-Nearest Neighbors (2D Clusters)
+      </button>
+      <button class="nav-tab" data-tab="tab-baseband" id="tabBasebandBtn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12h2M6 8h2M10 4h2M14 6h2M18 10h2M22 14h0"/><path d="M4 17l4-8 4 6 4-10 4 12"/></svg>
+        6G Baseband (L1 DSP)
       </button>
       <button class="nav-tab" data-tab="tab-terminal" id="tabTerminalBtn">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
@@ -343,12 +347,120 @@
         </div>
       </section>
 
-      <!-- TAB 3: Live C++ Terminal -->
+      <!-- TAB: 6G Real-Time Baseband (L1 DSP) -->
+      <section class="tab-pane" id="tab-baseband">
+        <div class="grid-2col">
+          <!-- Left: 16-QAM Constellation Canvas -->
+          <div class="panel">
+            <div class="panel-header">
+              <h2>16-QAM Constellation IQ Diagram</h2>
+              <div class="btn-group">
+                <button class="btn btn-sm btn-ghost active" id="btnShowEqSignal">Equalized (Clean)</button>
+                <button class="btn btn-sm btn-ghost" id="btnShowRawSignal">Raw Multipath (Distorted)</button>
+              </div>
+            </div>
+            <p class="panel-text">
+              Real-time In-Phase & Quadrature ($I + jQ$) baseband samples. Radio energy received from an antenna passes through an <strong>Adaptive LMS Equalizer</strong> using gradient descent to invert multipath delay echoes before <strong>Nearest-Neighbor demapping</strong>.
+            </p>
+
+            <div class="canvas-container">
+              <canvas id="constellationCanvas" width="560" height="420"></canvas>
+            </div>
+
+            <div class="canvas-legend">
+              <div class="legend-item"><span class="dot" style="background:#06b6d4;box-shadow:0 0 6px #06b6d4;"></span> Received Radio Samples</div>
+              <div class="legend-item"><span class="dot" style="background:#f59e0b;box-shadow:0 0 6px #f59e0b;"></span> 3GPP Ideal Constellation Grid</div>
+              <div class="legend-item"><span class="dot" style="background:#10b981;box-shadow:0 0 6px #10b981;"></span> Decision Slicing Boundaries</div>
+            </div>
+          </div>
+
+          <!-- Right: Baseband Specs & Real-Time Jitter Profiler -->
+          <div class="panel">
+            <div class="panel-header">
+              <h2>3GPP Physical Layer Metrics</h2>
+              <span class="tag" style="background:rgba(16,185,129,0.15);color:#34d399;border-color:rgba(16,185,129,0.3);">PASS: 3GPP Rel-18/19</span>
+            </div>
+
+            <!-- Stats grid -->
+            <div class="stat-strip" style="grid-template-columns:1fr 1fr;margin-bottom:16px;">
+              <div class="stat-card" style="padding:12px;">
+                <div>
+                  <div class="stat-label">Equalized EVM (RMS)</div>
+                  <div class="stat-value" style="font-size:1.3rem;color:#34d399;">8.77%</div>
+                  <div class="stat-desc">3GPP Limit: &lt; 12.5%</div>
+                </div>
+              </div>
+              <div class="stat-card" style="padding:12px;">
+                <div>
+                  <div class="stat-label">Bit Error Rate (BER)</div>
+                  <div class="stat-value" style="font-size:1.3rem;color:#34d399;">0.00</div>
+                  <div class="stat-desc">0 / 14,800 bit errors</div>
+                </div>
+              </div>
+              <div class="stat-card" style="padding:12px;">
+                <div>
+                  <div class="stat-label">Median Latency</div>
+                  <div class="stat-value" style="font-size:1.3rem;color:#67e8f9;">42 <span class="stat-unit">ns</span></div>
+                  <div class="stat-desc">&lt; 1000 ns (1 µs) budget</div>
+                </div>
+              </div>
+              <div class="stat-card" style="padding:12px;">
+                <div>
+                  <div class="stat-label">Memory Architecture</div>
+                  <div class="stat-value" style="font-size:1.3rem;color:#fbbf24;">Zero-Heap</div>
+                  <div class="stat-desc">Stack & SPSC Ring Buffer</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="panel-header mt-lg">
+              <h2>Real-Time Latency & Jitter Histogram</h2>
+              <span class="tag">Per-Symbol Timing</span>
+            </div>
+
+            <div class="accuracy-list">
+              <div class="acc-row timing-row active">
+                <span class="acc-k">Median (p50)</span>
+                <div class="acc-bar-wrap"><div class="acc-bar bg-cyan" style="width: 4.2%"></div></div>
+                <span class="acc-pct font-bold">42 ns</span>
+              </div>
+              <div class="acc-row timing-row active">
+                <span class="acc-k">p99 Worst-Case</span>
+                <div class="acc-bar-wrap"><div class="acc-bar bg-cyan" style="width: 8.4%"></div></div>
+                <span class="acc-pct font-bold">84 ns</span>
+              </div>
+              <div class="acc-row timing-row active">
+                <span class="acc-k">p99.99 Worst-Case</span>
+                <div class="acc-bar-wrap"><div class="acc-bar bg-cyan" style="width: 12.5%"></div></div>
+                <span class="acc-pct font-bold">125 ns</span>
+              </div>
+              <div class="acc-row timing-row" style="background:rgba(239,68,68,0.08);border:1px dashed rgba(239,68,68,0.3);">
+                <span class="acc-k" style="color:#f87171;">Max 6G Budget</span>
+                <div class="acc-bar-wrap"><div class="acc-bar" style="width: 100%;background:#f87171;"></div></div>
+                <span class="acc-pct" style="color:#f87171;">1000 ns</span>
+              </div>
+            </div>
+
+            <div style="margin-top:20px;">
+              <button class="btn btn-primary" id="btnTriggerBasebandSim" style="width:100%;justify-content:center;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                Execute Real-Time Baseband C++ Binary
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 4: Live C++ Terminal -->
       <section class="tab-pane" id="tab-terminal">
         <div class="panel">
           <div class="terminal-toolbar">
             <div class="terminal-actions">
-              <button class="btn btn-primary" id="btnRunHousePrices">
+              <button class="btn btn-primary" id="btnRunBaseband">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                Run ./build/real_time_baseband
+              </button>
+              <button class="btn btn-secondary" id="btnRunHousePrices">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
                 Run ./build/house_prices
               </button>

@@ -23,13 +23,15 @@ def ensure_binaries():
     house_bin = BUILD_DIR / "house_prices"
     knn_bin = BUILD_DIR / "classify_points"
     test_bin = BUILD_DIR / "tinyml_tests"
+    baseband_bin = BUILD_DIR / "real_time_baseband"
     
-    if not (house_bin.exists() and knn_bin.exists() and test_bin.exists()):
+    if not (house_bin.exists() and knn_bin.exists() and test_bin.exists() and baseband_bin.exists()):
         BUILD_DIR.mkdir(parents=True, exist_ok=True)
         cmd = (
             "clang++ -std=c++17 -O3 -Iinclude src/*.cpp examples/house_prices.cpp -o build/house_prices && "
             "clang++ -std=c++17 -O3 -Iinclude src/*.cpp examples/classify_points.cpp -o build/classify_points && "
-            "clang++ -std=c++17 -O3 -Iinclude src/*.cpp tests/test_main.cpp -o build/tinyml_tests"
+            "clang++ -std=c++17 -O3 -Iinclude src/*.cpp tests/test_main.cpp -o build/tinyml_tests && "
+            "clang++ -std=c++17 -O3 -Iinclude src/*.cpp examples/real_time_baseband.cpp -o build/real_time_baseband"
         )
         subprocess.run(cmd, shell=True, cwd=BASE_DIR, check=True)
 
@@ -59,6 +61,8 @@ class TinyMLRequestHandler(http.server.SimpleHTTPRequestHandler):
             self.execute_binary("./build/classify_points")
         elif path == "/api/run/tests":
             self.execute_binary("./build/tinyml_tests")
+        elif path == "/api/run/baseband":
+            self.execute_binary("./build/real_time_baseband")
         elif path == "/api/data/houses":
             self.serve_csv_as_json(DATA_DIR / "houses.csv")
         elif path == "/api/data/points":

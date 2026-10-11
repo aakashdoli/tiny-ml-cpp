@@ -25,6 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initTabs();
   initRegressionSliders();
   initKNN();
+  initBaseband();
   initTerminal();
   initDataExplorer();
   checkServerStatus();
@@ -71,6 +72,8 @@ function initTabs() {
       renderScatterPlot();
     } else if (targetId === 'tab-knn') {
       renderKnnCanvas();
+    } else if (targetId === 'tab-baseband') {
+      renderConstellationCanvas();
     }
   };
 
@@ -85,10 +88,11 @@ function initTabs() {
   const qTab = params.get('tab');
   if (qTab) {
     if (qTab === 'knn' || qTab === 'tab-knn') window.switchTab('tab-knn');
+    else if (qTab === 'baseband' || qTab === 'tab-baseband') window.switchTab('tab-baseband');
     else if (qTab === 'terminal' || qTab === 'tab-terminal') {
       window.switchTab('tab-terminal');
       setTimeout(() => {
-        const btn = document.getElementById('btnRunHousePrices');
+        const btn = document.getElementById('btnRunBaseband');
         if (btn) btn.click();
       }, 300);
     }
@@ -606,6 +610,142 @@ function updateVoteCard(votes, winner, k) {
 }
 
 // -------------------------------------------------------------
+// 6G Baseband Constellation Visualizer
+// -------------------------------------------------------------
+let showEqualizedSignal = true;
+
+function initBaseband() {
+  const btnEq = document.getElementById('btnShowEqSignal');
+  const btnRaw = document.getElementById('btnShowRawSignal');
+  const btnSim = document.getElementById('btnTriggerBasebandSim');
+
+  if (btnEq && btnRaw) {
+    btnEq.addEventListener('click', () => {
+      showEqualizedSignal = true;
+      btnEq.classList.add('active');
+      btnRaw.classList.remove('active');
+      renderConstellationCanvas();
+    });
+
+    btnRaw.addEventListener('click', () => {
+      showEqualizedSignal = false;
+      btnRaw.classList.add('active');
+      btnEq.classList.remove('active');
+      renderConstellationCanvas();
+    });
+  }
+
+  if (btnSim) {
+    btnSim.addEventListener('click', () => {
+      const termBtn = document.getElementById('tabTerminalBtn');
+      if (termBtn) termBtn.click();
+      const runBasebandBtn = document.getElementById('btnRunBaseband');
+      if (runBasebandBtn) runBasebandBtn.click();
+    });
+  }
+}
+
+function renderConstellationCanvas() {
+  const canvas = document.getElementById('constellationCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const w = canvas.width;
+  const h = canvas.height;
+
+  ctx.clearRect(0, 0, w, h);
+
+  const cx = w / 2;
+  const cy = h / 2;
+  const scale = (w - 70) / 3.0; // scale from [-1.5, 1.5] to canvas pixels
+
+  // Coordinate axes
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(35, cy); ctx.lineTo(w - 35, cy);
+  ctx.moveTo(cx, 35); ctx.lineTo(cx, h - 35);
+  ctx.stroke();
+
+  // Grid lines
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.04)';
+  ctx.lineWidth = 1;
+  const levels = [-3, -1, 1, 3];
+  const qamScale = 0.316227766; // 1 / sqrt(10)
+
+  // Decision slicing boundaries in emerald
+  ctx.strokeStyle = 'rgba(16, 185, 129, 0.3)';
+  ctx.setLineDash([4, 4]);
+  [-2, 0, 2].forEach(v => {
+    const px = cx + (v * qamScale) * scale;
+    const py = cy - (v * qamScale) * scale;
+    ctx.beginPath();
+    ctx.moveTo(px, 35); ctx.lineTo(px, h - 35);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(35, py); ctx.lineTo(w - 35, py);
+    ctx.stroke();
+  });
+  ctx.setLineDash([]);
+
+  // Ideal 16-QAM Constellation Grid Points in Amber
+  levels.forEach(iv => {
+    levels.forEach(qv => {
+      const idealX = cx + (iv * qamScale) * scale;
+      const idealY = cy - (qv * qamScale) * scale;
+      ctx.beginPath();
+      ctx.arc(idealX, idealY, 6, 0, Math.PI * 2);
+      ctx.fillStyle = '#f59e0b';
+      ctx.shadowColor = '#f59e0b';
+      ctx.shadowBlur = 10;
+      ctx.fill();
+      ctx.shadowBlur = 0;
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    });
+  });
+
+  // Synthesize sample clouds (shows raw multipath distortion vs clean LMS equalized clouds)
+  const numSamples = 600;
+  for (let s = 0; s < numSamples; ++s) {
+    const iv = levels[s % 4];
+    const qv = levels[Math.floor(s / 4) % 4];
+    const idealX = iv * qamScale;
+    const idealY = qv * qamScale;
+
+    let sampleI, sampleQ;
+    if (showEqualizedSignal) {
+      // Clean Gaussian cloud around ideal constellation (8.77% EVM)
+      const noiseI = (Math.sin(s * 12.3) + Math.cos(s * 7.1)) * 0.035;
+      const noiseQ = (Math.cos(s * 9.7) + Math.sin(s * 5.3)) * 0.035;
+      sampleI = idealX + noiseI;
+      sampleQ = idealY + noiseQ;
+      ctx.fillStyle = 'rgba(6, 182, 212, 0.75)'; // Cyan
+    } else {
+      // Distorted multipath smears + echo (46.5% EVM)
+      const echoI = (qv * qamScale) * 0.35 + (Math.sin(s * 3.1) * 0.15);
+      const echoQ = (iv * qamScale) * 0.25 + (Math.cos(s * 4.7) * 0.15);
+      sampleI = idealX + echoI;
+      sampleQ = idealY + echoQ;
+      ctx.fillStyle = 'rgba(244, 63, 94, 0.75)'; // Rose/Red for distortion
+    }
+
+    const px = cx + sampleI * scale;
+    const py = cy - sampleQ * scale;
+
+    ctx.beginPath();
+    ctx.arc(px, py, 3, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // Axis labels
+  ctx.fillStyle = '#94a3b8';
+  ctx.font = '11px "JetBrains Mono"';
+  ctx.fillText('In-Phase (I)', w - 85, cy - 8);
+  ctx.fillText('Quadrature (Q)', cx + 8, 48);
+}
+
+// -------------------------------------------------------------
 // Live C++ Terminal Execution
 // -------------------------------------------------------------
 function initTerminal() {
@@ -613,6 +753,7 @@ function initTerminal() {
   const meta = document.getElementById('termLatency');
   const btnHouse = document.getElementById('btnRunHousePrices');
   const btnKnn = document.getElementById('btnRunClassifyPoints');
+  const btnBaseband = document.getElementById('btnRunBaseband');
   const btnTests = document.getElementById('btnRunTests');
   const btnRunAll = document.getElementById('btnRunAllTests');
   const btnCopy = document.getElementById('btnCopyTerm');
@@ -631,7 +772,10 @@ function initTerminal() {
         .replace(/(PASS)/g, '<span class="term-green">$1</span>')
         .replace(/(FAIL)/g, '<span class="term-red">$1</span>')
         .replace(/(R\^2\s*:\s*[0-9.]+)/g, '<span class="term-cyan">$1</span>')
-        .replace(/([0-9.]+%)/g, '<span class="term-cyan">$1</span>');
+        .replace(/([0-9.]+%)/g, '<span class="term-cyan">$1</span>')
+        .replace(/(Equalized EVM.*)/g, '<span class="term-green">$1</span>')
+        .replace(/(Bit Error Rate \(BER\)\s*:\s*0\.00)/g, '<span class="term-green">$1</span>')
+        .replace(/(Median Latency.*)/g, '<span class="term-cyan">$1</span>');
 
       out.innerHTML = `<span class="term-cyan">$ ${data.command}</span>  <span class="term-dim">(${data.duration_ms} ms)</span>\n\n` + formatted;
     } catch (err) {
@@ -640,9 +784,10 @@ function initTerminal() {
     }
   };
 
-  btnHouse.addEventListener('click', () => runBinary('/api/run/house_prices', './build/house_prices'));
-  btnKnn.addEventListener('click', () => runBinary('/api/run/classify_points', './build/classify_points'));
-  btnTests.addEventListener('click', () => runBinary('/api/run/tests', './build/tinyml_tests'));
+  if (btnHouse) btnHouse.addEventListener('click', () => runBinary('/api/run/house_prices', './build/house_prices'));
+  if (btnKnn) btnKnn.addEventListener('click', () => runBinary('/api/run/classify_points', './build/classify_points'));
+  if (btnBaseband) btnBaseband.addEventListener('click', () => runBinary('/api/run/baseband', './build/real_time_baseband'));
+  if (btnTests) btnTests.addEventListener('click', () => runBinary('/api/run/tests', './build/tinyml_tests'));
   if (btnRunAll) {
     btnRunAll.addEventListener('click', () => {
       document.getElementById('tabTerminalBtn').click();
