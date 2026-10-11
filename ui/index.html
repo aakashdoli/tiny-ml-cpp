@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>tiny-ml-cpp | Interactive ML Dashboard</title>
+  <meta name="description" content="Interactive visualizer and playground for tiny-ml-cpp: zero-dependency C++17 machine learning engine.">
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-background">
+    <div class="glow-orb orb-1"></div>
+    <div class="glow-orb orb-2"></div>
+    <div class="glow-orb orb-3"></div>
+  </div>
+
+  <div class="container">
+    <!-- Header -->
+    <header class="header">
+      <div class="brand">
+        <div class="logo-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+          </svg>
+        </div>
+        <div>
+          <div class="brand-title">
+            <h1>tiny-ml-cpp</h1>
+            <span class="badge badge-tech">C++17</span>
+            <span class="badge badge-dep">Zero Dependencies</span>
+          </div>
+          <p class="brand-subtitle">Pure Standard Library Machine Learning Engine & Visualizer</p>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <div class="status-indicator" id="engineStatus">
+          <span class="status-dot"></span>
+          <span class="status-text">C++ Engine Ready</span>
+        </div>
+        <button class="btn btn-secondary" id="btnRunAllTests">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          Run Tests
+        </button>
+        <a class="btn btn-primary" id="githubLink" href="https://github.com/aakashdoli/tiny-ml-cpp" target="_blank" rel="noopener">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+          </svg>
+          GitHub Repo
+        </a>
+      </div>
+    </header>
+
+    <!-- Metrics Stat Strip -->
+    <section class="stat-strip">
+      <div class="stat-card">
+        <div class="stat-icon icon-cyan">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+        </div>
+        <div>
+          <div class="stat-label">Linear Regression R²</div>
+          <div class="stat-value">0.979 <span class="stat-unit">/ 1.0</span></div>
+          <div class="stat-desc">MSE dropped from 18.7M to 62.1k</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon icon-purple">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m4.93 4.93 4.24 4.24"/><path d="m14.83 9.17 4.24-4.24"/><path d="m14.83 14.83 4.24 4.24"/><path d="m9.17 14.83-4.24 4.24"/></svg>
+        </div>
+        <div>
+          <div class="stat-label">kNN Accuracy</div>
+          <div class="stat-value">96.0% <span class="stat-unit">(k = 3..15)</span></div>
+          <div class="stat-desc">3 clusters across 300 points</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon icon-emerald">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        </div>
+        <div>
+          <div class="stat-label">Unit Test Suite</div>
+          <div class="stat-value">6 / 6 <span class="stat-unit">Passing</span></div>
+          <div class="stat-desc">Zero-framework test runner</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon icon-amber">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        </div>
+        <div>
+          <div class="stat-label">C++ Latency</div>
+          <div class="stat-value">&lt; 2 <span class="stat-unit">ms</span></div>
+          <div class="stat-desc">Compiled with -O3 optimizations</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Navigation Tabs -->
+    <nav class="nav-tabs" role="tablist">
+      <button class="nav-tab active" data-tab="tab-regression" id="tabRegressionBtn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        Linear Regression (House Prices)
+      </button>
+      <button class="nav-tab" data-tab="tab-knn" id="tabKnnBtn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><circle cx="19" cy="5" r="2"/><circle cx="5" cy="19" r="2"/><circle cx="5" cy="5" r="2"/><circle cx="19" cy="19" r="2"/><line x1="12" y1="12" x2="19" y2="5"/><line x1="12" y1="12" x2="5" y2="19"/><line x1="12" y1="12" x2="5" y2="5"/><line x1="12" y1="12" x2="19" y2="19"/></svg>
+        k-Nearest Neighbors (2D Clusters)
+      </button>
+      <button class="nav-tab" data-tab="tab-terminal" id="tabTerminalBtn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+        Live C++ Execution Terminal
+      </button>
+      <button class="nav-tab" data-tab="tab-data" id="tabDataBtn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+        Datasets Explorer
+      </button>
+    </nav>
+
+    <!-- TAB 1: Linear Regression -->
+    <main>
+      <section class="tab-pane active" id="tab-regression">
+        <div class="grid-2col">
+          <!-- Left: Interactive Predictor -->
+          <div class="panel">
+            <div class="panel-header">
+              <h2>Interactive House Price Predictor</h2>
+              <span class="tag">Live Inference</span>
+            </div>
+            <p class="panel-text">
+              Adjust the house parameters below. The model rescales features with <code class="code-inline">Standardizer</code> and applies learned gradient descent weights in real time.
+            </p>
+
+            <div class="slider-group">
+              <div class="slider-header">
+                <label for="inputSize">Living Area</label>
+                <span class="slider-val" id="valSize">85 m²</span>
+              </div>
+              <input type="range" id="inputSize" min="30" max="180" value="85" step="1">
+              <div class="slider-hints"><span>30 m² (Studio)</span><span>180 m² (Villa)</span></div>
+            </div>
+
+            <div class="slider-group">
+              <div class="slider-header">
+                <label for="inputRooms">Number of Rooms</label>
+                <span class="slider-val" id="valRooms">3 rooms</span>
+              </div>
+              <input type="range" id="inputRooms" min="1" max="7" value="3" step="1">
+              <div class="slider-hints"><span>1 room</span><span>7 rooms</span></div>
+            </div>
+
+            <div class="slider-group">
+              <div class="slider-header">
+                <label for="inputAge">Building Age</label>
+                <span class="slider-val" id="valAge">12 years</span>
+              </div>
+              <input type="range" id="inputAge" min="0" max="80" value="12" step="1">
+              <div class="slider-hints"><span>0 (New construction)</span><span>80 years</span></div>
+            </div>
+
+            <!-- Price Output Card -->
+            <div class="price-display-card">
+              <div class="price-header">Estimated Valuation</div>
+              <div class="price-number" id="predPrice">4,025 <span class="price-unit">thousand SEK</span></div>
+              <div class="price-sub" id="predPriceSub">≈ €350,000 / $385,000 USD</div>
+              
+              <div class="weights-breakdown">
+                <div class="weight-item">
+                  <span class="weight-label">Size impact</span>
+                  <span class="weight-val text-pos" id="impactSize">+2,045 kSEK</span>
+                </div>
+                <div class="weight-item">
+                  <span class="weight-label">Rooms impact</span>
+                  <span class="weight-val text-pos" id="impactRooms">+120 kSEK</span>
+                </div>
+                <div class="weight-item">
+                  <span class="weight-label">Age depreciation</span>
+                  <span class="weight-val text-neg" id="impactAge">-140 kSEK</span>
+                </div>
+                <div class="weight-item">
+                  <span class="weight-label">Model base bias</span>
+                  <span class="weight-val" id="modelBias">4,435 kSEK</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="formula-box">
+              <div class="formula-title">Mathematical Formulation</div>
+              <div class="formula-code">
+                y_pred = bias + (w₁ · z_size) + (w₂ · z_rooms) + (w₃ · z_age)
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Visualizations -->
+          <div class="panel">
+            <div class="panel-header">
+              <h2>Gradient Descent Loss Curve</h2>
+              <span class="tag">500 Epochs</span>
+            </div>
+            <p class="panel-text">
+              Exponential reduction in Mean Squared Error (MSE) during training on 160 houses:
+            </p>
+            <div class="canvas-container">
+              <canvas id="lossCanvas" width="560" height="230"></canvas>
+            </div>
+            <div class="loss-milestones">
+              <div class="milestone">
+                <span class="m-label">Epoch 0 Loss:</span>
+                <span class="m-val">18,779,935.4</span>
+              </div>
+              <div class="milestone">
+                <span class="m-label">Epoch 500 Loss:</span>
+                <span class="m-val text-emerald">62,171.2 (-99.7%)</span>
+              </div>
+              <div class="milestone">
+                <span class="m-label">Test RMSE:</span>
+                <span class="m-val">262.1 kSEK</span>
+              </div>
+            </div>
+
+            <div class="panel-header mt-lg">
+              <h2>Size vs. Price Regression Line</h2>
+              <span class="tag">Evaluation</span>
+            </div>
+            <div class="canvas-container">
+              <canvas id="scatterCanvas" width="560" height="230"></canvas>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 2: k-Nearest Neighbors -->
+      <section class="tab-pane" id="tab-knn">
+        <div class="grid-2col">
+          <!-- Left: 2D Interactive Canvas -->
+          <div class="panel">
+            <div class="panel-header">
+              <h2>Interactive 2D Cluster Canvas</h2>
+              <div class="canvas-controls">
+                <button class="btn btn-sm btn-ghost" id="btnResetProbe">Center Probe</button>
+              </div>
+            </div>
+            <p class="panel-text">
+              <strong>Click or drag anywhere</strong> on the 2D plane below. The algorithm locates the <em>k</em> closest points in real-time, projects Euclidean distance vectors, and holds a majority vote.
+            </p>
+
+            <div class="canvas-container">
+              <canvas id="knnCanvas" width="560" height="420"></canvas>
+            </div>
+
+            <div class="canvas-legend">
+              <div class="legend-item"><span class="dot dot-c0"></span> Class 0 (Cluster A)</div>
+              <div class="legend-item"><span class="dot dot-c1"></span> Class 1 (Cluster B)</div>
+              <div class="legend-item"><span class="dot dot-c2"></span> Class 2 (Cluster C)</div>
+              <div class="legend-item"><span class="dot dot-probe"></span> Test Probe</div>
+            </div>
+          </div>
+
+          <!-- Right: KNN Controls & Voting Breakdown -->
+          <div class="panel">
+            <div class="panel-header">
+              <h2>kNN Parameters & Vote Tally</h2>
+              <span class="tag" id="currentKBadge">k = 3</span>
+            </div>
+
+            <div class="slider-group">
+              <div class="slider-header">
+                <label for="inputK">Number of Neighbors (k)</label>
+                <span class="slider-val" id="valK">3 neighbors</span>
+              </div>
+              <input type="range" id="inputK" min="1" max="21" value="3" step="2">
+              <div class="slider-hints"><span>k=1 (Exact)</span><span>k=11</span><span>k=21 (Smoothed)</span></div>
+            </div>
+
+            <!-- Vote Outcome Card -->
+            <div class="vote-result-card" id="voteCard">
+              <div class="vote-title">Current Classification</div>
+              <div class="winner-badge" id="winnerBadge">Class 2 Wins (100% of votes)</div>
+              <div class="vote-bars">
+                <div class="vote-bar-row">
+                  <div class="bar-label">Class 0</div>
+                  <div class="bar-track">
+                    <div class="bar-fill fill-c0" id="barC0" style="width: 0%"></div>
+                  </div>
+                  <div class="bar-count" id="countC0">0 votes</div>
+                </div>
+                <div class="vote-bar-row">
+                  <div class="bar-label">Class 1</div>
+                  <div class="bar-track">
+                    <div class="bar-fill fill-c1" id="barC1" style="width: 0%"></div>
+                  </div>
+                  <div class="bar-count" id="countC1">0 votes</div>
+                </div>
+                <div class="vote-bar-row">
+                  <div class="bar-label">Class 2</div>
+                  <div class="bar-track">
+                    <div class="bar-fill fill-c2" id="barC2" style="width: 100%"></div>
+                  </div>
+                  <div class="bar-count" id="countC2">3 votes</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Accuracy Comparison -->
+            <div class="panel-header mt-lg">
+              <h2>Accuracy Benchmark Across k</h2>
+              <span class="tag">75 Test Points</span>
+            </div>
+            <div class="accuracy-list">
+              <div class="acc-row" data-k="1">
+                <span class="acc-k">k = 1</span>
+                <div class="acc-bar-wrap"><div class="acc-bar" style="width: 89.3%"></div></div>
+                <span class="acc-pct">89.3%</span>
+              </div>
+              <div class="acc-row active" data-k="3">
+                <span class="acc-k">k = 3</span>
+                <div class="acc-bar-wrap"><div class="acc-bar bg-cyan" style="width: 96.0%"></div></div>
+                <span class="acc-pct font-bold">96.0%</span>
+              </div>
+              <div class="acc-row" data-k="5">
+                <span class="acc-k">k = 5</span>
+                <div class="acc-bar-wrap"><div class="acc-bar" style="width: 96.0%"></div></div>
+                <span class="acc-pct">96.0%</span>
+              </div>
+              <div class="acc-row" data-k="9">
+                <span class="acc-k">k = 9</span>
+                <div class="acc-bar-wrap"><div class="acc-bar" style="width: 96.0%"></div></div>
+                <span class="acc-pct">96.0%</span>
+              </div>
+              <div class="acc-row" data-k="15">
+                <span class="acc-k">k = 15</span>
+                <div class="acc-bar-wrap"><div class="acc-bar" style="width: 96.0%"></div></div>
+                <span class="acc-pct">96.0%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 3: Live C++ Terminal -->
+      <section class="tab-pane" id="tab-terminal">
+        <div class="panel">
+          <div class="terminal-toolbar">
+            <div class="terminal-actions">
+              <button class="btn btn-primary" id="btnRunHousePrices">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                Run ./build/house_prices
+              </button>
+              <button class="btn btn-secondary" id="btnRunClassifyPoints">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                Run ./build/classify_points
+              </button>
+              <button class="btn btn-secondary" id="btnRunTests">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                Run ./build/tinyml_tests
+              </button>
+            </div>
+            <div class="terminal-meta" id="termLatency">Latency: -- ms</div>
+          </div>
+
+          <!-- Terminal Mockup -->
+          <div class="terminal-window">
+            <div class="terminal-titlebar">
+              <div class="window-dots">
+                <span class="dot red"></span>
+                <span class="dot yellow"></span>
+                <span class="dot green"></span>
+              </div>
+              <div class="terminal-title" id="terminalTitle">tiny-ml-cpp — zsh</div>
+              <button class="copy-btn" id="btnCopyTerm" title="Copy output">Copy</button>
+            </div>
+            <pre class="terminal-body" id="terminalOutput">
+<span class="term-dim"># Click one of the buttons above to execute compiled C++ binaries live.</span>
+<span class="term-dim"># Or trigger via CLI: ./build/house_prices</span>
+            </pre>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 4: Datasets Explorer -->
+      <section class="tab-pane" id="tab-data">
+        <div class="panel">
+          <div class="data-controls">
+            <div class="btn-group">
+              <button class="btn btn-sm btn-primary active" id="btnShowHouses">houses.csv (200 rows)</button>
+              <button class="btn btn-sm btn-secondary" id="btnShowPoints">points.csv (300 rows)</button>
+            </div>
+            <input type="text" id="dataSearch" class="search-input" placeholder="Search rows...">
+          </div>
+
+          <div class="table-wrap">
+            <table class="data-table" id="dataTable">
+              <thead>
+                <tr id="tableHeader"></tr>
+              </thead>
+              <tbody id="tableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div>
+        <strong>tiny-ml-cpp</strong> — Developed from scratch in modern C++17.
+      </div>
+      <div>
+        Zero external dependencies • Standard Library only • MIT License
+      </div>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

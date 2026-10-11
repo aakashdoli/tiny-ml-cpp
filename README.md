@@ -28,15 +28,43 @@ k =  9  ->  96.0%
 
 ## Build and run
 
-You need a C++17 compiler and CMake 3.16+.
+## Web Visualizer & Dashboard
+
+An interactive dark-mode dashboard is included to explore model results visually:
+
+- **House Price Predictor**: Interactive sliders for size, rooms, and age with live valuations.
+- **kNN 2D Canvas**: Click anywhere to place a test probe and visualize nearest neighbor vectors & votes.
+- **Live C++ Runner**: Execute compiled binaries and inspect execution latency.
+- **Loss Curve & Datasets**: Interactive loss reduction chart and data browser.
+
+To launch the web dashboard:
 
 ```bash
-cmake -S . -B build
-cmake --build build
+python3 server.py
+# Open http://localhost:8080 in your browser
+```
+
+## Build and run CLI
+
+You need a C++17 compiler (e.g. `clang++` or `g++`) and optionally CMake 3.16+.
+
+**Direct compilation (Zero dependencies):**
+```bash
+mkdir -p build
+clang++ -std=c++17 -O3 -Iinclude src/*.cpp examples/house_prices.cpp -o build/house_prices
+clang++ -std=c++17 -O3 -Iinclude src/*.cpp examples/classify_points.cpp -o build/classify_points
+clang++ -std=c++17 -O3 -Iinclude src/*.cpp tests/test_main.cpp -o build/tinyml_tests
 
 ./build/house_prices      # linear regression demo
 ./build/classify_points   # kNN demo
-cd build && ctest         # run the tests
+./build/tinyml_tests      # test suite
+```
+
+**Or using CMake:**
+```bash
+cmake -S . -B build
+cmake --build build
+cd build && ctest
 ```
 
 Run the demos from the project root so they find the `data/` folder, or pass a CSV path: `./build/house_prices my_data.csv`
